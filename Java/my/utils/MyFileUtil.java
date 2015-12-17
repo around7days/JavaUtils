@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -174,6 +175,34 @@ public class MyFileUtil {
 
     /**
      * ファイルの出力処理
+     * @param obj 出力内容
+     * @param outputPath 出力先パス
+     * @param appendFlg 出力設定[true:追記 false:上書]
+     * @return 結果 true:成功 false:失敗
+     */
+    public static boolean fileOutput(Object obj,
+                                     String outputPath,
+                                     boolean appendFlg) {
+        return fileOutput(obj, outputPath, appendFlg, EncodeType.DEFAULT.getCharset());
+    }
+
+    /**
+     * ファイルの出力処理
+     * @param obj 出力内容
+     * @param outputPath 出力先パス
+     * @param appendFlg 出力設定[true:追記 false:上書]
+     * @param encode 文字コード
+     * @return 結果 true:成功 false:失敗
+     */
+    public static boolean fileOutput(Object obj,
+                                     String outputPath,
+                                     boolean appendFlg,
+                                     Charset encode) {
+        return fileOutput(Arrays.asList(obj), outputPath, appendFlg);
+    }
+
+    /**
+     * ファイルの出力処理
      * @param list 出力内容
      * @param outputPath 出力先パス
      * @param appendFlg 出力設定[true:追記 false:上書]
@@ -223,59 +252,6 @@ public class MyFileUtil {
                 bw.write(line.toString());
                 bw.write(lineFeed);
             }
-        } catch (IOException e) {
-            logger.error("file output error", e);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * ファイルの出力処理
-     * @param obj 出力内容
-     * @param outputPath 出力先パス
-     * @param appendFlg 出力設定[true:追記 false:上書]
-     * @return 結果 true:成功 false:失敗
-     */
-    public static boolean fileOutput(Object obj,
-                                     String outputPath,
-                                     boolean appendFlg) {
-        return fileOutput(obj, outputPath, appendFlg, EncodeType.DEFAULT.getCharset());
-    }
-
-    /**
-     * ファイルの出力処理
-     * @param obj 出力内容
-     * @param outputPath 出力先パス
-     * @param appendFlg 出力設定[true:追記 false:上書]
-     * @param encode 文字コード
-     * @return 結果 true:成功 false:失敗
-     */
-    public static boolean fileOutput(Object obj,
-                                     String outputPath,
-                                     boolean appendFlg,
-                                     Charset encode) {
-        // 出力先フォルダの生成
-        File outputFile = new File(outputPath);
-        outputFile.getParentFile().mkdirs();
-
-        // 出力オプションの設定
-        List<OpenOption> options = new ArrayList<OpenOption>();
-        options.add(StandardOpenOption.CREATE);
-        options.add(StandardOpenOption.WRITE);
-        if (appendFlg) {
-            // 追記
-            options.add(StandardOpenOption.APPEND);
-        } else {
-            // 上書き
-            options.add(StandardOpenOption.TRUNCATE_EXISTING);
-        }
-
-        // 出力
-        try (BufferedWriter bw = Files.newBufferedWriter(outputFile.toPath(),
-                                                         encode,
-                                                         options.toArray(new OpenOption[options.size()]))) {
-            bw.write(obj.toString());
         } catch (IOException e) {
             logger.error("file output error", e);
             return false;
