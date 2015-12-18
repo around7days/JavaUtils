@@ -349,59 +349,13 @@ public class MyFileUtil {
      * @return 結果 true:成功 false:失敗
      */
     public static boolean fileDelete(String root) {
-        // ファイルオブジェクトの生成
-        File file = new File(root);
-        if (!file.exists()) return false;
-
-        // 削除
-        return file.delete();
-    }
-
-    /**
-     * ファイル/ディレクトリの削除処理<br>
-     * （配下ファイルも削除）
-     * @param root ファイルパス
-     * @return 結果 true:成功 false:失敗
-     */
-    public static boolean fileDeleteRepeat(String root) {
-        // ファイルオブジェクトの生成
-        File file = new File(root);
-        if (!file.exists()) return false;
-
-        if (file.isDirectory()) {
-            // rootパスがディレクトリの時、再帰的処理を実行
-            File[] listFile = file.listFiles();
-            for (int i = 0; i < listFile.length; i++) {
-                fileDeleteRepeat(listFile[i].getPath());
-            }
+        try {
+            // ファイル削除
+            Files.deleteIfExists(Paths.get(root));
+        } catch (IOException e) {
+            logger.error("file delete error", e);
+            return false;
         }
-
-        // 削除
-        return file.delete();
+        return true;
     }
-
-    /**
-     * ファイルの存在チェック
-     * @param root ファイルパス
-     * @return 結果 true:存在する false:存在しない
-     */
-    public static boolean isFile(String root) {
-        if (root == null) return false;
-
-        File file = new File(root);
-        return file.exists() && file.isFile();
-    }
-
-    /**
-     * ディレクトリの存在チェック
-     * @param root ディレクトリパス
-     * @return 結果 true:存在する false:存在しない
-     */
-    public static boolean isDirectory(String root) {
-        if (root == null) return false;
-
-        File file = new File(root);
-        return file.exists() && file.isDirectory();
-    }
-
 }
